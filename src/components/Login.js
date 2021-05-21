@@ -1,16 +1,43 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from 'axios';
 
-const Login = () => {
-  // make a post request to retrieve a token from the api
-  // when you have handled the token, navigate to the BubblePage route
+const initialValues = {
+  error: '',
+  credentials: {
+    username:'',
+    password:'',
+  }
+};
+
+const Login = (props) => {
+  const [values, setValues ] = useState(initialValues);
+
+  const handleChanges = e => {
+    setValues({
+      credentials: {
+        ...values,
+        [e.target.name]: e.target.value
+      }
+    })
+
+  }
 
   useEffect(()=>{
+    axios.post('http://localhost:5000/api/login', { username: 'Lambda School', password: 'i<3Lambd4' })
+      .then(res =>{
+        console.log(res.data);
+        localStorage.setItem('token');
+        props.history.push('/protected')
+      })
+      .catch(err =>{
+        console.log(err)
+        setValues({error: 'Username or Password is not valid.'})
+      })
+
     // make a post request to retrieve a token from the api
     // when you have handled the token, navigate to the BubblePage route
   });
-  
-  const error = "";
-  //replace with error state
+
 
   return (
     <div>
@@ -18,8 +45,27 @@ const Login = () => {
       <div data-testid="loginForm" className="login-form">
         <h2>Build login form here</h2>
       </div>
+      <div>
+        <form onSubmit={useEffect}>
+          <input
+            data-testid="username"
+            type="text"
+            name="username"
+            value={values.username}
+            onChange={handleChanges}
+          />
+          <input
+            data-testid="password"
+            type="password"
+            name="password"
+            value={values.password}
+            onChange={handleChanges}
+          />
+          <button>Log in</button>
+        </form>
+      </div>
 
-      <p data-testid="errorMessage" className="error">{error}</p>
+      <p data-testid="errorMessage" className="error">{values.error}</p>
     </div>
   );
 };
